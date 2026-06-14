@@ -20,17 +20,19 @@ const stagger = {
 
 function FlowingDot({ delay, pathIndex }: { delay: number; pathIndex: number }) {
   const paths = useContext(PathsContext);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const circleRef = useRef<SVGCircleElement>(null);
   const offsetRef = useRef(0);
 
   useEffect(() => {
     const path = paths[pathIndex];
-    if (!path) return;
+    const el = circleRef.current;
+    if (!path || !el) return;
     let raf: number;
     const update = () => {
       const len = path.getTotalLength();
       const pt = path.getPointAtLength(offsetRef.current * len);
-      setPos({ x: pt.x, y: pt.y });
+      el.setAttribute("cx", String(pt.x));
+      el.setAttribute("cy", String(pt.y));
       raf = requestAnimationFrame(update);
     };
     raf = requestAnimationFrame(update);
@@ -50,7 +52,7 @@ function FlowingDot({ delay, pathIndex }: { delay: number; pathIndex: number }) 
     return () => cancelAnimationFrame(raf);
   }, [delay]);
 
-  return <circle cx={pos.x} cy={pos.y} r={3} fill="#00d4ff" opacity={0.9} />;
+  return <circle ref={circleRef} cx={0} cy={0} r={3} fill="#00d4ff" opacity={0.9} />;
 }
 
 export default function ArchitectureContent() {
