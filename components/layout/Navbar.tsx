@@ -908,7 +908,7 @@ export default function Navbar() {
               })}
             </div>
 
-            <HamburgerButton isOpen={isOpen} onClick={handleClose} />
+            <HamburgerButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
           </div>
         </div>
 

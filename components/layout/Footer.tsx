@@ -543,6 +543,76 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Supervisors */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+        <FooterDivider />
+        <motion.div
+          className="mt-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <div className="flex items-center gap-2 mb-5">
+            <motion.div
+              className="w-1.5 h-1.5 rounded-full bg-[#f97316]"
+              animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <span className="text-sm font-semibold text-white uppercase tracking-wider">Supervisors</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Academic Supervisor */}
+            <motion.div
+              className="rounded-xl border border-[#2a2a3e] bg-[#111118]/60 p-4 relative overflow-hidden group"
+              whileHover={{ borderColor: "#00d4ff40", y: -2 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: "linear-gradient(135deg, #00d4ff08, transparent)" }}
+              />
+              <div className="relative flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4ff] to-[#7c3aed] flex items-center justify-center flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 14c3.313 0 6-2.687 6-6V4H6v4c0 3.313 2.687 6 6 6zm-1 1.93A7.001 7.001 0 015 9H3a9.001 9.001 0 008 8.944V22h2v-5.056A9.001 9.001 0 0021 9h-2a7.001 7.001 0 01-6 6.93V15.93z" />
+                  </svg>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs text-[#00d4ff] font-medium mb-0.5">Academic Supervisor</div>
+                  <div className="text-sm font-semibold text-white truncate">Dr. Magda Ibrahim</div>
+                  <div className="text-[10px] text-gray-500 mt-0.5">Associate Professor, ECE Dept.</div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Industry Supervisor */}
+            <motion.div
+              className="rounded-xl border border-[#2a2a3e] bg-[#111118]/60 p-4 relative overflow-hidden group"
+              whileHover={{ borderColor: "#f9731640", y: -2 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: "linear-gradient(135deg, #f9731608, transparent)" }}
+              />
+              <div className="relative flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f97316] to-[#ea4335] flex items-center justify-center flex-shrink-0">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                    <path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z" />
+                  </svg>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs text-[#f97316] font-medium mb-0.5">Industry Supervisor</div>
+                  <div className="text-sm font-semibold text-white truncate">Eng. Ahmed Yasser</div>
+                  <div className="text-[10px] text-gray-500 mt-0.5">Senior Software Architect</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+
       {/* Bottom bar */}
       <FooterDivider />
       <div className="relative z-10">
