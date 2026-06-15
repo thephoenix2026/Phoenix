@@ -814,14 +814,286 @@ export default function SupervisorsContent() {
               subtitle="Professional mentorship and industry expertise"
               color="#f97316"
             />
-            <div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {industrySupervisors.map((supervisor, index) => (
-                <SupervisorCard
+
+            {/* Featured: Eng. Ahmed Yasser */}
+            <div className="mt-14">
+              {industrySupervisors.map((supervisor) => (
+                <motion.div
                   key={supervisor.name}
-                  supervisor={supervisor}
-                  index={index}
-                  type="industry"
-                />
+                  initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="relative"
+                >
+                  <div className="relative rounded-3xl border border-[#f97316]/30 bg-[#111118]/90 backdrop-blur-xl p-8 md:p-10 overflow-hidden group">
+                    {/* Animated gradient background */}
+                    <motion.div
+                      className="absolute inset-0 opacity-30"
+                      animate={{
+                        background: [
+                          "radial-gradient(circle at 20% 50%, rgba(249,115,22,0.15), transparent 50%)",
+                          "radial-gradient(circle at 80% 50%, rgba(249,115,22,0.15), transparent 50%)",
+                          "radial-gradient(circle at 50% 20%, rgba(249,115,22,0.15), transparent 50%)",
+                          "radial-gradient(circle at 20% 50%, rgba(249,115,22,0.15), transparent 50%)",
+                        ],
+                      }}
+                      transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    />
+
+                    {/* Rotating border glow */}
+                    <motion.div
+                      className="absolute -inset-[1px] rounded-3xl"
+                      style={{
+                        background: "conic-gradient(from 0deg, #f97316, #ea4335, #f97316, transparent, #f97316)",
+                      }}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    />
+                    <div className="absolute inset-[1px] rounded-3xl bg-[#111118]/95" />
+
+                    {/* Corner accents */}
+                    <motion.div
+                      className="absolute top-0 left-0 w-32 h-32"
+                      style={{ background: "linear-gradient(135deg, rgba(249,115,22,0.2), transparent)" }}
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                    />
+                    <motion.div
+                      className="absolute bottom-0 right-0 w-32 h-32"
+                      style={{ background: "linear-gradient(-45deg, rgba(234,67,53,0.2), transparent)" }}
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+                    />
+
+                    {/* Sparkles */}
+                    <motion.div
+                      className="absolute top-6 right-6"
+                      animate={{ rotate: [0, 180, 360], scale: [1, 1.3, 1] }}
+                      transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Sparkles size={24} className="text-[#f97316]/60" />
+                    </motion.div>
+                    <motion.div
+                      className="absolute top-6 right-14"
+                      animate={{ rotate: [360, 180, 0], scale: [1, 1.2, 1] }}
+                      transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Star size={18} className="text-yellow-400/60" />
+                    </motion.div>
+
+                    {/* Badge */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                      className="relative z-10 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#f97316]/15 border border-[#f97316]/30 mb-6"
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, 360] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Briefcase size={14} className="text-[#f97316]" />
+                      </motion.div>
+                      <span className="text-[#f97316] text-xs font-bold tracking-wider uppercase">Industry Supervisor</span>
+                    </motion.div>
+
+                    <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start gap-8">
+                      {/* Avatar with quadruple ring */}
+                      <div className="relative flex-shrink-0">
+                        <motion.div
+                          className="absolute -inset-4 rounded-full"
+                          style={{ border: "2px solid rgba(249,115,22,0.3)" }}
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                        />
+                        <motion.div
+                          className="absolute -inset-6 rounded-full"
+                          style={{ border: "1px dashed rgba(249,115,22,0.2)" }}
+                          animate={{ rotate: -360 }}
+                          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                        />
+                        <motion.div
+                          className="absolute -inset-8 rounded-full"
+                          style={{ backgroundColor: "rgba(249,115,22,0.05)" }}
+                          animate={{ scale: [1, 1.15, 1] }}
+                          transition={{ duration: 3, repeat: Infinity }}
+                        />
+                        <motion.div
+                          className="absolute -inset-10 rounded-full"
+                          style={{ border: "1px solid rgba(249,115,22,0.1)" }}
+                          animate={{ rotate: 360, scale: [1, 1.05, 1] }}
+                          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                        />
+                        {/* Orbiting dot */}
+                        <motion.div
+                          className="absolute -inset-5"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                        >
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#f97316]" style={{ boxShadow: "0 0 10px #f97316" }} />
+                        </motion.div>
+                        {/* Second orbiting dot */}
+                        <motion.div
+                          className="absolute -inset-7"
+                          animate={{ rotate: -360 }}
+                          transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                        >
+                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#ea4335]" style={{ boxShadow: "0 0 8px #ea4335" }} />
+                        </motion.div>
+                        <motion.div
+                          className="w-28 h-28 rounded-full bg-gradient-to-br from-orange-400 via-red-500 to-pink-600 flex items-center justify-center relative z-10"
+                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                          style={{ boxShadow: "0 0 40px rgba(249,115,22,0.4), 0 0 80px rgba(249,115,22,0.2)" }}
+                        >
+                          <span className="text-3xl font-bold text-white">AY</span>
+                        </motion.div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 text-center lg:text-left">
+                        <motion.h3
+                          className="text-3xl md:text-4xl font-bold text-white mb-2"
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          {supervisor.name}
+                        </motion.h3>
+
+                        <motion.p
+                          className="text-[#f97316] text-base font-semibold mb-1"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.3 }}
+                        >
+                          {supervisor.title}
+                        </motion.p>
+
+                        <motion.p
+                          className="text-gray-400 text-sm mb-1 flex items-center gap-1.5 justify-center lg:justify-start"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.35 }}
+                        >
+                          <Building2 size={14} /> {supervisor.institution}
+                        </motion.p>
+
+                        <motion.p
+                          className="text-gray-500 text-xs mb-4"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          {supervisor.department}
+                        </motion.p>
+
+                        <motion.p
+                          className="text-gray-300 text-sm mb-6 leading-relaxed max-w-2xl"
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.45 }}
+                        >
+                          {supervisor.bio}
+                        </motion.p>
+
+                        {/* Research Interests */}
+                        {supervisor.researchInterests && (
+                          <div className="mb-5">
+                            <motion.p
+                              className="text-[10px] text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5 justify-center lg:justify-start"
+                              initial={{ opacity: 0 }}
+                              whileInView={{ opacity: 1 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.5 }}
+                            >
+                              <BookOpen size={11} className="text-[#f97316]" /> Expertise
+                            </motion.p>
+                            <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+                              {supervisor.researchInterests.map((interest, i) => (
+                                <motion.span
+                                  key={interest}
+                                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
+                                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                                  viewport={{ once: true }}
+                                  transition={{ delay: 0.55 + i * 0.06, type: "spring" }}
+                                  whileHover={{ scale: 1.1, y: -3 }}
+                                  className="px-3 py-1 text-xs rounded-full border cursor-default"
+                                  style={{
+                                    backgroundColor: `${tagColors[i % tagColors.length].bg}12`,
+                                    color: tagColors[i % tagColors.length].text,
+                                    borderColor: `${tagColors[i % tagColors.length].bg}30`,
+                                  }}
+                                >
+                                  {interest}
+                                </motion.span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Contributions */}
+                        {supervisor.contributions && (
+                          <div className="mb-5">
+                            <motion.p
+                              className="text-[10px] text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5 justify-center lg:justify-start"
+                              initial={{ opacity: 0 }}
+                              whileInView={{ opacity: 1 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: 0.6 }}
+                            >
+                              <Award size={11} className="text-[#f97316]" /> Key Contributions
+                            </motion.p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                              {supervisor.contributions.map((contrib, i) => (
+                                <motion.li
+                                  key={contrib}
+                                  initial={{ opacity: 0, x: -12 }}
+                                  whileInView={{ opacity: 1, x: 0 }}
+                                  viewport={{ once: true }}
+                                  transition={{ delay: 0.65 + i * 0.06 }}
+                                  className="text-sm text-gray-300 flex items-start gap-2 list-none"
+                                >
+                                  <motion.div whileHover={{ scale: 1.4, rotate: 15 }}>
+                                    <ChevronRight size={14} className="mt-0.5 text-[#f97316]" />
+                                  </motion.div>
+                                  {contrib}
+                                </motion.li>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Social */}
+                        <div className="flex gap-3 justify-center lg:justify-start">
+                          <motion.a
+                            href={`mailto:${supervisor.email}`}
+                            whileHover={{ scale: 1.15, y: -3 }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center border border-[#f97316]/30 text-[#f97316] hover:bg-[#f97316]/10 transition-colors"
+                          >
+                            <Mail size={16} />
+                          </motion.a>
+                          <motion.a
+                            href={supervisor.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.15, y: -3 }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center border border-[#f97316]/30 text-[#f97316] hover:bg-[#f97316]/10 transition-colors"
+                          >
+                            <ExternalLink size={16} />
+                          </motion.a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               ))}
             </div>
           </div>
