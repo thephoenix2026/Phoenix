@@ -8,6 +8,7 @@ import GlowCard from "@/components/shared/GlowCard";
 import GridBackground from "@/components/shared/GridBackground";
 
 const PathsContext = createContext<(SVGPathElement | null)[]>([]);
+const EMPTY_PATHS: (SVGPathElement | null)[] = [];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -57,7 +58,12 @@ function FlowingDot({ delay, pathIndex }: { delay: number; pathIndex: number }) 
 
 export default function ArchitectureContent() {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  const [pathEls, setPathEls] = useState<(SVGPathElement | null)[]>([]);
+  const pathElsRef = useRef<(SVGPathElement | null)[]>([]);
+  const [pathsReady, setPathsReady] = useState(false);
+
+  useEffect(() => {
+    setPathsReady(true);
+  }, []);
 
   const hardwareItems = [
     { name: "FLIR Lepton 3.5", role: "Thermal Camera", specs: "640×480 • 9Hz • LWIR", color: "cyan" },
@@ -173,7 +179,7 @@ export default function ArchitectureContent() {
                 return (
                   <path
                     key={id}
-                    ref={(el) => { setPathEls(prev => { const next = [...prev]; next[i] = el; return next; }); }}
+                    ref={(el) => { pathElsRef.current[i] = el; }}
                     d={`M${x1},105 C${x1},170 500,180 500,310`}
                     fill="none" stroke="#2a2a3e" strokeWidth="1"
                     strokeDasharray="6 4"
@@ -219,7 +225,7 @@ export default function ArchitectureContent() {
                 return (
                   <path
                     key={id}
-                    ref={(el) => { setPathEls(prev => { const next = [...prev]; next[i + 6] = el; return next; }); }}
+                    ref={(el) => { pathElsRef.current[i + 6] = el; }}
                     d={`M${x1},370 C${x1},430 500,440 500,520`}
                     fill="none" stroke="#2a2a3e" strokeWidth="1"
                     strokeDasharray="6 4"
@@ -259,7 +265,7 @@ export default function ArchitectureContent() {
               })}
 
               {/* Animated flowing dots on first two paths */}
-              <PathsContext.Provider value={pathEls}>
+              <PathsContext.Provider value={pathsReady ? pathElsRef.current : EMPTY_PATHS}>
                 <FlowingDot delay={0} pathIndex={0} />
                 <FlowingDot delay={0.6} pathIndex={2} />
                 <FlowingDot delay={1.2} pathIndex={4} />
