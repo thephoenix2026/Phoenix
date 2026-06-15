@@ -14,9 +14,9 @@ const contactInfo = [
 ];
 
 const teamContacts = [
-  { name: "Ahmad Al-Rashid", role: "Team Lead", email: "ahmad@phoenix.com" },
-  { name: "Fatima Hassan", role: "Hardware Lead", email: "fatima@phoenix.com" },
-  { name: "Omar Khalil", role: "Software Lead", email: "omar@phoenix.com" },
+  { name: "Hazem Nabil Zaky", role: "Team Lead & AI Developer", email: "hazem@phoenix.com", color: "#00d4ff" },
+  { name: "Mahmoud Dahy", role: "Mechanical Design Lead", email: "mahmoud@phoenix.com", color: "#7c3aed" },
+  { name: "Dr. Magda Ibrahim", role: "Academic Supervisor", email: "magda@university.edu", color: "#f97316" },
 ];
 
 const socials = [
@@ -218,13 +218,19 @@ export default function ContactContent() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <GlowCard className="p-6 text-center h-full">
-                  <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#00d4ff]/10 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-[#00d4ff]">
+                  <div
+                    className="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `${member.color}15` }}
+                  >
+                    <span
+                      className="text-2xl font-bold"
+                      style={{ color: member.color }}
+                    >
                       {member.name.split(" ").map((n) => n[0]).join("")}
                     </span>
                   </div>
                   <h4 className="text-white font-bold mb-1">{member.name}</h4>
-                  <p className="text-[#00d4ff] text-sm mb-3">{member.role}</p>
+                  <p className="text-sm mb-3" style={{ color: member.color }}>{member.role}</p>
                   <a
                     href={`mailto:${member.email}`}
                     className="text-gray-400 text-sm hover:text-[#00d4ff] transition-colors"
