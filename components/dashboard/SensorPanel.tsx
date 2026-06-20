@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { initialSensorData, type SensorReading } from "@/lib/data/sensors";
+import type { SensorReading } from "@/lib/data/robots";
 import GlowCard from "@/components/shared/GlowCard";
 
-export default function SensorPanel() {
-  const [sensors, setSensors] = useState<SensorReading[]>(initialSensorData);
+interface SensorPanelProps {
+  sensors: SensorReading[];
+  robotCodename?: string;
+}
+
+export default function SensorPanel({ sensors: initialSensors, robotCodename = "PHX" }: SensorPanelProps) {
+  const [sensors, setSensors] = useState<SensorReading[]>(initialSensors);
+
+  useEffect(() => {
+    setSensors(initialSensors);
+  }, [initialSensors]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -40,10 +49,10 @@ export default function SensorPanel() {
     <GlowCard glowColor="#00d4ff" className="flex flex-col">
       <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-[#00d4ff] animate-pulse" />
-        Sensor Array
+        Sensor Array — {robotCodename}
       </h3>
       <div className="flex-1 space-y-2.5 overflow-y-auto max-h-[420px] pr-1 custom-scrollbar">
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {sensors.map((sensor) => {
             const statusColor = getStatusColor(sensor);
             const barPercent = getBarPercent(sensor);
@@ -51,6 +60,9 @@ export default function SensorPanel() {
               <motion.div
                 key={sensor.name}
                 layout
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
                 className="bg-[#0a0a0f]/60 rounded-lg p-2.5 border border-[#1a1a2e]"
               >
                 <div className="flex items-center justify-between mb-1.5">

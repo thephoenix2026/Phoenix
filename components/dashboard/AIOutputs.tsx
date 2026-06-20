@@ -2,79 +2,49 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { AIModelOutput } from "@/lib/data/robots";
 import GlowCard from "@/components/shared/GlowCard";
 
-interface AIModelOutput {
-  model: string;
-  status: "active" | "processing" | "idle";
-  output: string;
-  confidence?: number;
+interface AIOutputsProps {
+  outputs: AIModelOutput[];
+  robotCodename?: string;
 }
-
-const initialOutputs: AIModelOutput[] = [
-  {
-    model: "Thermal Detection",
-    status: "active",
-    output: "2 survivors detected, Priority: HIGH",
-    confidence: 94.2,
-  },
-  {
-    model: "Acoustic Analysis",
-    status: "active",
-    output: "No sounds detected in current sector",
-    confidence: 87.5,
-  },
-  {
-    model: "Hazard Assessment",
-    status: "active",
-    output: "Risk Level: MODERATE, PPE: Required",
-    confidence: 91.0,
-  },
-  {
-    model: "Structural Risk",
-    status: "active",
-    output: "Collapse Probability: 12%, LOW",
-    confidence: 89.3,
-  },
-  {
-    model: "Rescue Assistant",
-    status: "active",
-    output: "Recommended: Proceed with caution via Route B",
-    confidence: 96.1,
-  },
-];
 
 const altOutputs: Record<string, string[]> = {
   "Thermal Detection": [
-    "3 survivors detected, Priority: CRITICAL",
-    "Heat signature lost - re-scanning",
-    "2 survivors detected, Priority: HIGH",
+    "Scanning thermal signature — 3 survivors detected, Priority: HIGH",
+    "Heat signature lost — adjusting IR sensitivity",
+    "Multi-spectral analysis complete — 2 survivors confirmed",
   ],
   "Acoustic Analysis": [
-    "Faint tapping detected at 340Hz",
-    "No sounds detected in current sector",
-    "Machinery vibration detected - filtering",
+    "Faint tapping detected at 340Hz — human origin probable",
+    "No survivor sounds in current sector — moving to next zone",
+    "Machinery vibration detected — filtering background noise",
   ],
   "Hazard Assessment": [
-    "Risk Level: HIGH, PPE: Full HAZMAT Required",
-    "Risk Level: LOW, PPE: Standard",
-    "Risk Level: MODERATE, PPE: Required",
+    "Risk Level: HIGH — PPE: Full HAZMAT Required — toxin detected",
+    "Risk Level: LOW — Safe to proceed without additional PPE",
+    "Risk Level: MODERATE — Structural instability in adjacent area",
   ],
   "Structural Risk": [
-    "Collapse Probability: 28%, MODERATE",
-    "Collapse Probability: 5%, LOW",
-    "Collapse Probability: 45%, HIGH",
+    "Collapse Probability: 28% — MODERATE — Monitor load-bearing walls",
+    "Collapse Probability: 5% — LOW — Structure is stable",
+    "Collapse Probability: 45% — HIGH — Evacuate immediately",
   ],
   "Rescue Assistant": [
-    "Recommended: Re-route via Corridor A-3",
-    "Recommended: Hold position, scan ongoing",
-    "Recommended: Proceed with caution via Route B",
+    "Recommended: Re-route via Corridor A-3 for safer access",
+    "Recommended: Hold position — secondary scan in progress",
+    "Recommended: Proceed with caution — survivor extraction route B",
   ],
 };
 
-export default function AIOutputs() {
+export default function AIOutputs({ outputs: initialOutputs, robotCodename = "PHX" }: AIOutputsProps) {
   const [outputs, setOutputs] = useState<AIModelOutput[]>(initialOutputs);
   const [flashIdx, setFlashIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    setOutputs(initialOutputs);
+  }, [initialOutputs]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -103,7 +73,7 @@ export default function AIOutputs() {
     }, 5000 + Math.random() * 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [initialOutputs]);
 
   const statusColor = (s: string) => {
     if (s === "active") return "#22c55e";
@@ -115,21 +85,25 @@ export default function AIOutputs() {
     <GlowCard glowColor="#a855f7" className="flex flex-col h-full">
       <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-[#a855f7] animate-pulse" />
-        AI Model Outputs
+        AI Model Outputs — {robotCodename}
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 flex-1">
-        <AnimatePresence>
+        <AnimatePresence mode="popLayout">
           {outputs.map((out, i) => (
             <motion.div
               key={out.model}
               layout
-              className="bg-[#0a0a0f]/60 rounded-lg p-3 border border-[#1a1a2e] flex flex-col"
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{
+                opacity: 1,
+                scale: 1,
                 borderColor: flashIdx === i ? "#a855f7" : "#1a1a2e",
                 boxShadow: flashIdx === i
                   ? "0 0 15px rgba(168, 85, 247, 0.3)"
                   : "0 0 0px rgba(168, 85, 247, 0)",
               }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#0a0a0f]/60 rounded-lg p-3 border border-[#1a1a2e] flex flex-col"
               transition={{ duration: 0.3 }}
             >
               <div className="flex items-center gap-2 mb-2">

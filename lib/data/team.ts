@@ -20,7 +20,7 @@ export const teamMembers: TeamMember[] = [
     team: "Leadership",
     image: "/team/hazem.jpg",
     bio: "Leading the Phoenix project as main team leader while driving the AI/ML pipeline and data science research. Also overseeing hardware design integration.",
-    skills: ["Python", "TensorFlow", "PyTorch", "Computer Vision", "Data Science", "Leadership", "System Architecture"],
+    skills: ["Python", "TensorFlow", "PyTorch", "Computer Vision", "Data Science", "Leadership", "System Architecture", "MLOps"],
     responsibilities: [
       "Main Team Leadership & Coordination",
       "AI/ML Model Development",

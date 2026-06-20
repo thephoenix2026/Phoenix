@@ -1,7 +1,18 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import GlowCard from "@/components/shared/GlowCard";
+import type { WeatherCondition } from "@/lib/data/weather";
+
+interface ThermalFeedProps {
+  robotName?: string;
+  robotCodename?: string;
+  sectorLabel?: string;
+  survivorsFound?: number;
+  color?: string;
+  weather?: WeatherCondition;
+}
 
 interface HotSpot {
   x: number;
@@ -11,11 +22,6 @@ interface HotSpot {
   vx: number;
   vy: number;
 }
-
-const hotSpots: HotSpot[] = [
-  { x: 150, y: 120, radius: 45, intensity: 0.9, vx: 0.3, vy: 0.2 },
-  { x: 420, y: 220, radius: 38, intensity: 0.75, vx: -0.2, vy: 0.15 },
-];
 
 function tempToColor(temp: number): [number, number, number] {
   if (temp < 0.25) {
@@ -33,10 +39,18 @@ function tempToColor(temp: number): [number, number, number] {
   }
 }
 
-export default function ThermalFeed() {
+export default function ThermalFeed({
+  robotCodename = "PHOENIX",
+  sectorLabel = "SECTOR 3",
+  survivorsFound = 2,
+  color = "#ff6b35",
+  weather = "clear",
+}: ThermalFeedProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scanLineRef = useRef(0);
   const frameRef = useRef(0);
+  const weatherRef = useRef(weather);
+  weatherRef.current = weather;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -47,10 +61,27 @@ export default function ThermalFeed() {
     canvas.width = 640;
     canvas.height = 360;
 
+    const hotSpots: HotSpot[] = sectorLabel === "SECTOR 7"
+      ? [
+          { x: 200, y: 150, radius: 60, intensity: 0.95, vx: 0.4, vy: 0.1 },
+          { x: 450, y: 250, radius: 50, intensity: 0.85, vx: -0.3, vy: 0.2 },
+        ]
+      : sectorLabel === "SECTOR 12"
+      ? [
+          { x: 180, y: 100, radius: 35, intensity: 0.7, vx: 0.1, vy: 0.05 },
+          { x: 350, y: 200, radius: 40, intensity: 0.65, vx: -0.15, vy: 0.1 },
+          { x: 500, y: 280, radius: 30, intensity: 0.8, vx: 0.2, vy: -0.1 },
+        ]
+      : [
+          { x: 150, y: 120, radius: 45, intensity: 0.9, vx: 0.3, vy: 0.2 },
+          { x: 420, y: 220, radius: 38, intensity: 0.75, vx: -0.2, vy: 0.15 },
+        ];
+
     let animId: number;
 
     const draw = () => {
       frameRef.current++;
+      const w = weatherRef.current;
 
       hotSpots.forEach((hs) => {
         hs.x += hs.vx;
@@ -62,10 +93,12 @@ export default function ThermalFeed() {
       const imageData = ctx.createImageData(canvas.width, canvas.height);
       const data = imageData.data;
 
+      const noiseBase = w === "sandstorm" ? 0.12 : w === "storm" ? 0.1 : w === "fog" ? 0.08 : 0.05;
+      const noiseRange = w === "sandstorm" ? 0.12 : w === "storm" ? 0.1 : w === "fog" ? 0.07 : 0.08;
+
       for (let y = 0; y < canvas.height; y++) {
         for (let x = 0; x < canvas.width; x++) {
-          let temp = 0.05 + Math.random() * 0.08;
-
+          let temp = noiseBase + Math.random() * noiseRange;
           hotSpots.forEach((hs) => {
             const dx = x - hs.x;
             const dy = y - hs.y;
@@ -75,9 +108,24 @@ export default function ThermalFeed() {
               temp += hs.intensity * falloff * falloff;
             }
           });
-
           temp = Math.min(1, Math.max(0, temp));
-          const [r, g, b] = tempToColor(temp);
+
+          let [r, g, b] = tempToColor(temp);
+
+          // Weather effects on thermal
+          if (w === "rain" || w === "storm") {
+            r = Math.floor(r * 0.9);
+            g = Math.floor(g * 0.9);
+            b = Math.floor(b * 0.95);
+          } else if (w === "fog") {
+            r = Math.min(255, r + 15);
+            g = Math.min(255, g + 15);
+            b = Math.min(255, b + 20);
+          } else if (w === "sandstorm") {
+            r = Math.min(255, r + 20);
+            g = Math.min(255, g + 10);
+          }
+
           const i = (y * canvas.width + x) * 4;
           data[i] = r;
           data[i + 1] = g;
@@ -104,10 +152,27 @@ export default function ThermalFeed() {
         ctx.fillText(`T: ${(hs.intensity * 42 + 20).toFixed(1)}°C`, hs.x - 20, hs.y - hs.radius - 15);
       });
 
+      // Rain on thermal lens
+      if (w === "rain" || w === "storm") {
+        ctx.fillStyle = `rgba(150, 190, 255, ${w === "storm" ? 0.06 : 0.03})`;
+        for (let i = 0; i < (w === "storm" ? 20 : 10); i++) {
+          const rx = Math.random() * canvas.width;
+          const ry = Math.random() * canvas.height;
+          ctx.beginPath();
+          ctx.ellipse(rx, ry, 1.5, 3, 0.3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
       ctx.fillStyle = "rgba(0, 212, 255, 0.85)";
       ctx.font = "bold 14px monospace";
       ctx.textAlign = "left";
-      ctx.fillText("THERMAL FEED", 12, 24);
+      ctx.fillText(`THERMAL FEED — ${sectorLabel}`, 12, 24);
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = "rgba(0, 212, 255, 0.6)";
+      ctx.font = "12px monospace";
+      ctx.fillText(robotCodename, canvas.width - 12, 24);
 
       const t = new Date().toLocaleTimeString("en-US", { hour12: false });
       ctx.textAlign = "right";
@@ -120,10 +185,10 @@ export default function ThermalFeed() {
 
     draw();
     return () => cancelAnimationFrame(animId);
-  }, []);
+  }, [sectorLabel, robotCodename]);
 
   return (
-    <GlowCard glowColor="#ff6b35" className="p-2 relative overflow-hidden">
+    <GlowCard glowColor={color} className="p-2 relative overflow-hidden">
       <div className="relative rounded-lg overflow-hidden bg-black">
         <canvas
           ref={canvasRef}
@@ -132,7 +197,7 @@ export default function ThermalFeed() {
         />
         <div className="absolute top-3 right-3 bg-black/70 px-3 py-1.5 rounded">
           <span className="text-[#00d4ff] text-xs font-bold">
-            DETECTED: 2 SURVIVORS
+            DETECTED: {survivorsFound} SURVIVOR{survivorsFound !== 1 ? "S" : ""}
           </span>
         </div>
         <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-black/80 to-transparent" />

@@ -2,28 +2,25 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { rescueAlerts as initialAlerts } from "@/lib/data/sensors";
+import type { Alert } from "@/lib/data/robots";
 import GlowCard from "@/components/shared/GlowCard";
 
-interface Alert {
-  id: number;
-  type: "critical" | "warning" | "info" | "success";
-  message: string;
-  timestamp: string;
-  source: string;
+interface AlertSystemProps {
+  alerts: Alert[];
+  robotCodename?: string;
 }
 
 const simulatedMessages: Omit<Alert, "id" | "timestamp">[] = [
-  { type: "critical", message: "Temperature spike in Sector 9 - exceeds safety threshold", source: "Temperature Sensor" },
-  { type: "warning", message: "Battery level at 34% - consider recharging", source: "Power System" },
-  { type: "info", message: "Path planning updated: new shortest route calculated", source: "AI - Pathfinding" },
+  { type: "critical", message: "Temperature spike detected — exceeds safety threshold", source: "Temperature Sensor" },
+  { type: "warning", message: "Battery level dropping — consider recharging", source: "Power System" },
+  { type: "info", message: "Path planning updated: new shortest route calculated", source: "AI — Pathfinding" },
   { type: "success", message: "Obstacle cleared: debris removed from corridor", source: "Navigation System" },
-  { type: "critical", message: "Gas leak detected in adjacent room", source: "Gas Sensor" },
-  { type: "warning", message: "Motor temperature elevated on left track", source: "Motor Controller" },
-  { type: "info", message: "New acoustic signature classified as machinery", source: "AI - Acoustic Model" },
-  { type: "success", message: "Survivor extraction point marked and verified", source: "AI - Rescue Assistant" },
-  { type: "warning", message: "IMU drift detected - recalibrating", source: "MPU6050 IMU" },
-  { type: "info", message: "Map updated: 12 new grid cells explored", source: "SLAM Module" },
+  { type: "critical", message: "Gas leak detected in adjacent compartment", source: "Gas Sensor" },
+  { type: "warning", message: "Motor temperature elevated — reducing speed", source: "Motor Controller" },
+  { type: "info", message: "New acoustic signature classified as non-human", source: "AI — Acoustic Model" },
+  { type: "success", message: "Survivor extraction point marked and verified", source: "AI — Rescue Assistant" },
+  { type: "warning", message: "IMU drift detected — recalibrating gyroscope", source: "MPU6050 IMU" },
+  { type: "info", message: "Map updated: 8 new grid cells explored", source: "SLAM Module" },
 ];
 
 const alertBorderColor: Record<string, string> = {
@@ -40,19 +37,21 @@ const alertBadgeColor: Record<string, string> = {
   success: "bg-green-500/20 text-green-400",
 };
 
-export default function AlertSystem() {
-  const [alerts, setAlerts] = useState<Alert[]>(() =>
-    initialAlerts.map((a) => ({ ...a, type: a.type as Alert["type"] }))
-  );
+export default function AlertSystem({ alerts: initialAlerts, robotCodename = "PHX" }: AlertSystemProps) {
+  const [alerts, setAlerts] = useState<Alert[]>(initialAlerts);
   const [nextId, setNextId] = useState(100);
+
+  useEffect(() => {
+    setAlerts(initialAlerts);
+    setNextId(100);
+  }, [initialAlerts]);
 
   useEffect(() => {
     const interval = setInterval(
       () => {
         const msg =
           simulatedMessages[Math.floor(Math.random() * simulatedMessages.length)];
-        const now = new Date();
-        const timestamp = now.toLocaleTimeString("en-US", { hour12: false });
+        const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
 
         setAlerts((prev) => [
           { ...msg, id: nextId, timestamp },
@@ -69,7 +68,7 @@ export default function AlertSystem() {
     <GlowCard glowColor="#ef4444" className="flex flex-col">
       <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-        Alert System
+        Alert System — {robotCodename}
       </h3>
       <div className="flex-1 overflow-y-auto max-h-[460px] space-y-2 pr-1 custom-scrollbar">
         <AnimatePresence initial={false}>

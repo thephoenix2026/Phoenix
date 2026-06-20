@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { teamMembers, mainTeamLeader, teamLeaders } from "@/lib/data/team";
 import GridBackground from "@/components/shared/GridBackground";
@@ -219,6 +219,169 @@ function AnimatedSectionTitle({
   );
 }
 
+/* ─── Holographic Skill Grid — No Percentages ─── */
+function HolographicSkillsGrid({ skills }: { skills: string[] }) {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const colorPalette = [
+    "#00d4ff", "#f97316", "#ef4444", "#7c3aed", "#10b981",
+    "#eab308", "#ec4899", "#06b6d4", "#0ea5e9", "#a855f7",
+    "#f59e0b", "#34d399", "#fb923c",
+  ];
+  const total = skills.length;
+  const cols = 3;
+  const rows = Math.ceil(total / cols);
+
+  return (
+    <div className="relative rounded-xl border border-yellow-500/15 bg-yellow-500/[0.02] p-3 overflow-hidden">
+      <motion.div
+        className="absolute inset-0 opacity-25"
+        animate={{
+          background: [
+            "radial-gradient(circle at 20% 30%, rgba(234,179,8,0.08), transparent 50%)",
+            "radial-gradient(circle at 80% 70%, rgba(0,212,255,0.06), transparent 50%)",
+            "radial-gradient(circle at 60% 20%, rgba(234,179,8,0.08), transparent 50%)",
+          ],
+        }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div
+        className="absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(234,179,8,0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(234,179,8,0.25) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+        }}
+      />
+
+      <motion.p
+        className="relative z-10 text-[9px] text-yellow-400/50 font-mono mb-2 tracking-[0.2em] uppercase"
+        animate={{ opacity: [0.4, 0.8, 0.4] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      >
+        Neural Skill Matrix
+      </motion.p>
+
+      {/* SVG connections between adjacent cells */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ opacity: 0.15 }}>
+        {skills.map((_, i) => {
+          if ((i + 1) % cols === 0 && i < total - 1) return null;
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          const x1 = (col / (cols - 1)) * 100 + 6;
+          const y1 = (row / (rows - 1 || 1)) * 100 + 12;
+          const nextCol = (i + 1) % cols;
+          const nextRow = Math.floor((i + 1) / cols);
+          const x2 = (nextCol / (cols - 1)) * 100 + 6;
+          const y2 = (nextRow / (rows - 1 || 1)) * 100 + 12;
+          return (
+            <motion.line
+              key={i}
+              x1={`${x1}%`}
+              y1={`${y1}%`}
+              x2={`${x2}%`}
+              y2={`${y2}%`}
+              stroke={colorPalette[i % colorPalette.length]}
+              strokeWidth="0.5"
+              strokeDasharray="2 3"
+              initial={{ pathLength: 0, opacity: 0 }}
+              whileInView={{ pathLength: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05, duration: 0.6 }}
+            />
+          );
+        })}
+      </svg>
+
+      <div className="relative z-10 grid grid-cols-3 gap-1.5">
+        {skills.map((skill, i) => {
+          const color = colorPalette[i % colorPalette.length];
+          const isHovered = hoveredIdx === i;
+          return (
+            <motion.div
+              key={skill}
+              initial={{ opacity: 0, y: 6 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.02 }}
+              onMouseEnter={() => setHoveredIdx(i)}
+              onMouseLeave={() => setHoveredIdx(null)}
+              className="relative"
+            >
+              <motion.div
+                className="absolute -inset-1 rounded-lg opacity-0"
+                style={{ background: `radial-gradient(circle, ${color}25, transparent 70%)` }}
+                animate={isHovered ? { opacity: 1, scale: 1.15 } : { opacity: 0, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+              <motion.div
+                className="relative rounded-lg p-2 overflow-hidden cursor-default"
+                style={{
+                  backgroundColor: `${color}06`,
+                  border: `1px solid ${color}18`,
+                }}
+                animate={{
+                  borderColor: isHovered ? `${color}70` : `${color}18`,
+                  boxShadow: isHovered ? `0 0 16px ${color}25, inset 0 0 12px ${color}08` : "none",
+                  y: isHovered ? -2 : 0,
+                  scale: isHovered ? 1.04 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 350, damping: 22 }}
+              >
+                <motion.div
+                  className="absolute inset-0 rounded-lg opacity-0"
+                  style={{
+                    background: `linear-gradient(135deg, transparent 40%, ${color}15, transparent 60%)`,
+                    backgroundSize: "200% 200%",
+                  }}
+                  animate={isHovered ? { backgroundPosition: ["200% 200%", "-100% -100%"], opacity: 1 } : { opacity: 0 }}
+                  transition={{ duration: 1.2, repeat: Infinity }}
+                />
+                <div className="relative z-10 flex items-center gap-2">
+                  <div className="relative flex-shrink-0">
+                    <motion.div
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: color }}
+                      animate={{
+                        boxShadow: isHovered
+                          ? [`0 0 3px ${color}`, `0 0 7px ${color}`, `0 0 3px ${color}`]
+                          : [`0 0 1px ${color}40`, `0 0 0px ${color}`, `0 0 1px ${color}40`],
+                      }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    />
+                    {isHovered && (
+                      <motion.div
+                        className="absolute -inset-1 rounded-full"
+                        style={{ border: `1px solid ${color}50` }}
+                        animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      />
+                    )}
+                  </div>
+                  <span
+                    className="text-[11px] font-semibold leading-tight transition-colors duration-300"
+                    style={{ color: isHovered ? color : "#cbd5e1" }}
+                  >
+                    {skill}
+                  </span>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      <motion.div
+        className="h-px mt-3"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(234,179,8,0.2), rgba(0,212,255,0.2), transparent)",
+        }}
+        animate={{ opacity: [0.2, 0.6, 0.2] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      />
+    </div>
+  );
+}
+
 /* ─── Team Leader Spotlight ─── */
 function LeaderSpotlight({ leader }: { leader: typeof mainTeamLeader }) {
   if (!leader) return null;
@@ -423,7 +586,7 @@ function LeaderSpotlight({ leader }: { leader: typeof mainTeamLeader }) {
                   {leader.bio}
                 </motion.p>
 
-                {/* Skills with animated bars */}
+                {/* Holographic Skill Grid — no percentages, no bars */}
                 <div className="mb-6">
                   <motion.p
                     className="text-[10px] text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5 justify-center lg:justify-start"
@@ -432,38 +595,9 @@ function LeaderSpotlight({ leader }: { leader: typeof mainTeamLeader }) {
                     viewport={{ once: true }}
                     transition={{ delay: 0.45 }}
                   >
-                    <Zap size={11} style={{ color }} /> Technical Skills
+                    <Zap size={11} style={{ color }} /> Neural Skill Matrix
                   </motion.p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {leader.skills.map((skill, i) => {
-                      const skillLevel = 85 + ((i * 7) % 15);
-                      return (
-                        <motion.div
-                          key={skill}
-                          initial={{ opacity: 0, y: 10 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.5 + i * 0.05 }}
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-2 cursor-default"
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] text-yellow-400 font-semibold">{skill}</span>
-                            <span className="text-[9px] text-yellow-400/60 font-mono">{skillLevel}%</span>
-                          </div>
-                          <div className="h-1 rounded-full bg-yellow-500/10 overflow-hidden">
-                            <motion.div
-                              className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-orange-500"
-                              initial={{ width: 0 }}
-                              whileInView={{ width: `${skillLevel}%` }}
-                              viewport={{ once: true }}
-                              transition={{ duration: 0.8, delay: 0.6 + i * 0.05 }}
-                            />
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+                  <HolographicSkillsGrid skills={leader.skills} />
                 </div>
 
                 {/* Responsibilities */}

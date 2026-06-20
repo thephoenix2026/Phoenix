@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -26,6 +27,7 @@ import {
   Layers,
   Shield,
   ChevronRight,
+  Cpu,
 } from "lucide-react";
 
 /* ─── Background Effects ─── */
@@ -160,70 +162,198 @@ function HeroAvatar() {
   );
 }
 
-/* ─── Animated Skill Bar ─── */
+/* ─── Holographic Skill Constellation ─── */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IconType = any;
 
-function SkillBar({
-  name,
-  level,
-  color,
-  icon: Icon,
-  index,
-}: {
-  name: string;
-  level: number;
-  color: string;
-  icon: IconType;
-  index: number;
-}) {
+function SkillConstellation({ skills }: { skills: { name: string; color: string; icon: IconType; desc: string }[] }) {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const total = skills.length;
+  const cx = 50;
+  const cy = 45;
+  const radius = 34;
+
+  const positions = skills.map((_, i) => {
+    const angle = (i / total) * Math.PI * 2 - Math.PI / 2;
+    return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+  });
+
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -30 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.06, type: "spring", stiffness: 300 }}
-      whileHover={{ x: 4, scale: 1.01 }}
-      className="group"
-    >
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-2">
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity, delay: index * 0.2 }}
-          >
-            <Icon size={14} style={{ color }} />
-          </motion.div>
-          <span className="text-sm text-white font-medium">{name}</span>
-        </div>
-        <span className="text-xs font-mono" style={{ color }}>
-          {level}%
-        </span>
-      </div>
-      <div className="relative h-2 bg-[#1a1a2e] rounded-full overflow-hidden">
+    <div className="relative w-full aspect-square max-w-[700px] mx-auto">
+      <div className="absolute inset-0 overflow-hidden rounded-3xl">
         <motion.div
-          className="absolute inset-y-0 left-0 rounded-full"
-          style={{
-            backgroundImage: `linear-gradient(90deg, ${color}, ${color}80)`,
+          className="absolute inset-0 opacity-25"
+          animate={{
+            background: [
+              "radial-gradient(circle at 30% 40%, rgba(124,58,237,0.12), transparent 60%)",
+              "radial-gradient(circle at 70% 60%, rgba(0,212,255,0.12), transparent 60%)",
+              "radial-gradient(circle at 50% 30%, rgba(234,179,8,0.10), transparent 60%)",
+              "radial-gradient(circle at 30% 40%, rgba(124,58,237,0.12), transparent 60%)",
+            ],
           }}
-          initial={{ width: 0 }}
-          whileInView={{ width: `${level}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, delay: index * 0.06, ease: "easeOut" }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
-        {/* Shimmer */}
-        <motion.div
-          className="absolute inset-0"
+        <div
+          className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
-            backgroundSize: "200% 100%",
+              "linear-gradient(rgba(124,58,237,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.5) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
           }}
-          animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
         />
       </div>
-    </motion.div>
+
+      <motion.div
+        className="absolute inset-0"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+      >
+        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+          {positions.map((pos, i) => (
+            <motion.line
+              key={`core-${i}`}
+              x1={`${cx}%`}
+              y1={`${cy}%`}
+              x2={`${pos.x}%`}
+              y2={`${pos.y}%`}
+              stroke={skills[i].color}
+              strokeWidth={hoveredIdx === i ? "1" : "0.4"}
+              strokeOpacity={hoveredIdx === i ? 0.8 : 0.2}
+              initial={{ pathLength: 0 }}
+              whileInView={{ pathLength: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.03, duration: 0.8 }}
+            />
+          ))}
+          {positions.map((pos, i) => {
+            const next = (i + 1) % total;
+            return (
+              <motion.line
+                key={`ring-${i}`}
+                x1={`${pos.x}%`}
+                y1={`${pos.y}%`}
+                x2={`${positions[next].x}%`}
+                y2={`${positions[next].y}%`}
+                stroke={skills[i].color}
+                strokeWidth="0.3"
+                strokeOpacity={0.12}
+                strokeDasharray="3 4"
+                initial={{ pathLength: 0 }}
+                whileInView={{ pathLength: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 + i * 0.02, duration: 0.6 }}
+              />
+            );
+          })}
+        </svg>
+
+        <div
+          className="absolute z-10"
+          style={{ left: `${cx}%`, top: `${cy}%`, transform: "translate(-50%, -50%)" }}
+        >
+          <motion.div
+            className="absolute rounded-full"
+            style={{ width: 80, height: 80, left: -40, top: -40, border: "1px solid rgba(139,92,246,0.25)" }}
+            animate={{ scale: [1, 2, 1], opacity: [0.4, 0, 0.4] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeOut" }}
+          />
+          <motion.div
+            className="absolute rounded-full"
+            style={{ width: 56, height: 56, left: -28, top: -28, border: "1px solid rgba(139,92,246,0.3)" }}
+            animate={{ scale: [1, 1.6, 1], opacity: [0.5, 0, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
+          />
+          <motion.div
+            className="w-14 h-14 rounded-full flex items-center justify-center"
+            style={{
+              background: "radial-gradient(circle, rgba(139,92,246,0.3), rgba(139,92,246,0.05))",
+            }}
+            animate={{
+              boxShadow: [
+                "0 0 40px rgba(139,92,246,0.25)",
+                "0 0 70px rgba(139,92,246,0.45)",
+                "0 0 40px rgba(139,92,246,0.25)",
+              ],
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <Brain size={24} className="text-purple-400" />
+          </motion.div>
+        </div>
+
+        {skills.map((skill, i) => {
+          const pos = positions[i];
+          const isHovered = hoveredIdx === i;
+          return (
+            <motion.div
+              key={skill.name}
+              className="absolute z-20"
+              style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: "translate(-50%, -50%)" }}
+              onMouseEnter={() => setHoveredIdx(i)}
+              onMouseLeave={() => setHoveredIdx(null)}
+            >
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+                className="flex flex-col items-center"
+              >
+                <motion.div
+                  className="absolute -inset-3 rounded-full"
+                  style={{ background: `radial-gradient(circle, ${skill.color}20, transparent 70%)` }}
+                  animate={isHovered ? { scale: [1, 1.5, 1], opacity: [0.4, 0.8, 0.4] } : { opacity: 0, scale: 1 }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+                <motion.div
+                  className="w-10 h-10 rounded-full flex items-center justify-center relative"
+                  style={{ backgroundColor: `${skill.color}15`, border: `1px solid ${skill.color}30` }}
+                  animate={{
+                    scale: isHovered ? 1.35 : 1,
+                    boxShadow: isHovered
+                      ? `0 0 30px ${skill.color}50, inset 0 0 15px ${skill.color}20`
+                      : `0 0 0px transparent`,
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <motion.div
+                    className="absolute w-1.5 h-1.5 rounded-full"
+                    style={{ backgroundColor: skill.color }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 3 + i * 0.2, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div
+                      className="absolute w-1.5 h-1.5 rounded-full"
+                      style={{ backgroundColor: skill.color, transform: "translateX(22px)", filter: `drop-shadow(0 0 3px ${skill.color})` }}
+                    />
+                  </motion.div>
+                  <skill.icon size={16} style={{ color: skill.color }} />
+                </motion.div>
+                <motion.span
+                  className="text-[10px] font-bold mt-2 whitespace-nowrap text-white/60"
+                  animate={isHovered ? { color: skill.color, textShadow: `0 0 8px ${skill.color}50` } : {}}
+                >
+                  {skill.name}
+                </motion.span>
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.9 }}
+                  animate={isHovered ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 6, scale: 0.9 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full mt-2 w-44 p-3 rounded-xl z-50 pointer-events-none"
+                  style={{
+                    backgroundColor: `${skill.color}15`,
+                    border: `1px solid ${skill.color}30`,
+                    backdropFilter: "blur(16px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  <p className="text-[10px] text-white/70 leading-relaxed">{skill.desc}</p>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+    </div>
   );
 }
 
@@ -482,18 +612,19 @@ function StatCard({
 /* ─── Main Component ─── */
 export default function HazemProfile() {
   const skills = [
-    { name: "Python", level: 95, color: "#00d4ff", icon: Code },
-    { name: "TensorFlow", level: 92, color: "#f97316", icon: Brain },
-    { name: "PyTorch", level: 90, color: "#ef4444", icon: Brain },
-    { name: "Computer Vision", level: 93, color: "#7c3aed", icon: Eye },
-    { name: "Data Science", level: 88, color: "#10b981", icon: Database },
-    { name: "System Architecture", level: 90, color: "#eab308", icon: Layers },
-    { name: "Leadership", level: 94, color: "#ec4899", icon: Users },
-    { name: "Research & Publications", level: 85, color: "#06b6d4", icon: BookOpen },
-    { name: "Next.js / TypeScript", level: 87, color: "#00d4ff", icon: Code },
-    { name: "DevOps / CI/CD", level: 80, color: "#a855f7", icon: Shield },
-    { name: "ROS2 / Robotics", level: 78, color: "#f97316", icon: Rocket },
-    { name: "Flutter / Mobile", level: 75, color: "#10b981", icon: Code },
+    { name: "Python", color: "#00d4ff", icon: Code, desc: "Core language for all AI pipelines — 50K+ lines of production code" },
+    { name: "TensorFlow", color: "#f97316", icon: Brain, desc: "Built & deployed 5 computer vision models with 96.8% accuracy" },
+    { name: "PyTorch", color: "#ef4444", icon: Zap, desc: "Rapid prototyping of acoustic & transformer models" },
+    { name: "Computer Vision", color: "#7c3aed", icon: Eye, desc: "YOLOv6n, ResNet-50, thermal image processing pipeline" },
+    { name: "Data Science", color: "#10b981", icon: Database, desc: "35K+ curated thermal, acoustic & environmental samples" },
+    { name: "System Architecture", color: "#eab308", icon: Layers, desc: "Full-stack design from edge sensors to cloud AI ensemble" },
+    { name: "Leadership", color: "#ec4899", icon: Users, desc: "Led 11 engineers across 4 sub-teams for 9 months" },
+    { name: "Research", color: "#06b6d4", icon: BookOpen, desc: "3 papers submitted to IEEE/ACM on multi-modal AI for rescue" },
+    { name: "Full-Stack Dev", color: "#0ea5e9", icon: Code, desc: "Next.js, React, TypeScript — built entire mission control UI" },
+    { name: "DevOps", color: "#a855f7", icon: Shield, desc: "CI/CD pipelines, Docker deployment, cloud infrastructure" },
+    { name: "ROS2 / Robotics", color: "#f59e0b", icon: Rocket, desc: "Robot control systems, sensor integration, real-time comms" },
+    { name: "Flutter / Mobile", color: "#34d399", icon: Target, desc: "Cross-platform companion app for field rescue teams" },
+    { name: "MLOps", color: "#fb923c", icon: Cpu, desc: "ML pipeline automation, model versioning, A/B testing, monitoring & drift detection" },
   ];
 
   const responsibilities = [
@@ -801,41 +932,57 @@ export default function HazemProfile() {
 
         <GlowingDivider color="#7c3aed" />
 
-        {/* ─── Skills Section ─── */}
+        {/* ─── Skills Section — Holographic Constellation ─── */}
         <motion.div
           className="my-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <div className="flex items-center gap-3 mb-6">
+          <motion.div
+            className="flex items-center gap-3 mb-6"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
             <motion.div
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              className="w-10 h-10 rounded-lg flex items-center justify-center relative"
               style={{
                 backgroundColor: "rgba(124,58,237,0.15)",
                 border: "1px solid rgba(124,58,237,0.3)",
               }}
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 4, repeat: Infinity }}
+              animate={{
+                boxShadow: [
+                  "0 0 0px rgba(124,58,237,0)",
+                  "0 0 20px rgba(124,58,237,0.3)",
+                  "0 0 0px rgba(124,58,237,0)",
+                ],
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
             >
-              <Zap size={20} className="text-purple-400" />
+              <motion.div
+                className="absolute w-1 h-1 rounded-full bg-purple-400"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <div className="absolute w-1 h-1 bg-purple-400 rounded-full" style={{ transform: "translateX(20px)" }} />
+              </motion.div>
+              <Zap size={20} className="text-purple-400 relative z-10" />
             </motion.div>
-            <h2 className="text-2xl font-bold text-white">
-              Technical Skills
-            </h2>
-          </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Skill Constellation</h2>
+              <motion.p
+                className="text-[#64748b] text-xs font-mono"
+                animate={{ opacity: [0.4, 0.8, 0.4] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                13 nodes · neural network topology
+              </motion.p>
+            </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {skills.map((skill, i) => (
-              <SkillBar
-                key={skill.name}
-                name={skill.name}
-                level={skill.level}
-                color={skill.color}
-                icon={skill.icon}
-                index={i}
-              />
-            ))}
+          <div className="rounded-2xl border border-purple-500/15 bg-[#111118]/40 backdrop-blur-xl overflow-hidden">
+            <SkillConstellation skills={skills} />
           </div>
         </motion.div>
 
