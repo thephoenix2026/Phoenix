@@ -15,7 +15,7 @@ export interface Supervisor {
 export const supervisors: Supervisor[] = [
   {
     name: "Dr. Magda Ibrahim",
-    title: "Associate Professor of Power Electric Engineering",
+    title: "Associate Professor of Electrical Engineering",
     institution: "University",
     department: "Department of Electronics & Communication Engineering",
     image: "/supervisors/dr-magda.jpg",
